@@ -187,7 +187,3 @@ if ($("otherKeys")) {
   );
   bindFile("otherKeysFile", "otherKeys", "otherKeysInfo", true);
 }
-$("clearAll")?.addEventListener("click", () => {
-  $("app").reset();
-  for (const el of document.querySelectorAll("pre.info")) show(el.id, "");
-});

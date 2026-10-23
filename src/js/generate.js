@@ -46,7 +46,3 @@ $("dlRevocation").addEventListener("click", () =>
     generated.revocationCertificate,
   ),
 );
-$("clearAll").addEventListener("click", () => {
-  generated = null;
-  $("genDownloads").hidden = true;
-});

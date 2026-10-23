@@ -26,3 +26,26 @@ label {
   display: block;
   margin: 0.25rem 0;
 }
+button,
+a.home,
+::file-selector-button {
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #888;
+  border-radius: 4px;
+  background: #f6f6f6;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+button:hover,
+a.home:hover,
+::file-selector-button:hover {
+  background: #e6e6e6;
+}
+footer {
+  border-top: 1px solid #ccc;
+  padding: 1rem 0;
+  text-align: right;
+}

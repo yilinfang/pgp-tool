@@ -23,7 +23,7 @@ Output is compatible with GnuPG and other OpenPGP software (v4 keys).
   The browser does not run any other script.
 - The page stores nothing: no cookies, no localStorage, no sessionStorage, no IndexedDB.
 - The page never reads or writes the clipboard.
-- Keys live in page memory only. Close the tab or press **Clear all** to forget them.
+- Keys live in page memory only. Close or reload the tab to forget them.
 - Each page is separate. When you go to another page, the page forgets all keys.
 
 The page cannot protect you from malware or browser extensions on the same computer.
