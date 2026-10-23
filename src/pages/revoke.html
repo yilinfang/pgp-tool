@@ -16,6 +16,7 @@
       </p>
 
       <section>
+        <h2>Your public key</h2>
         <textarea
           id="revKey"
           rows="4"
@@ -23,6 +24,10 @@
           placeholder="Your public key"
         ></textarea>
         <input type="file" id="revKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+      </section>
+
+      <section>
+        <h2>Revocation certificate</h2>
         <textarea
           id="revCert"
           rows="4"
@@ -30,6 +35,10 @@
           placeholder="Your revocation certificate"
         ></textarea>
         <input type="file" id="revCertFile" accept=".asc,.rev,.txt" />
+      </section>
+
+      <section>
+        <h2>Revoked public key</h2>
         <button type="button" id="revBtn">Revoke</button>
         <pre class="info" id="revStatus"></pre>
         <textarea id="revOut" rows="4" spellcheck="false" readonly></textarea>

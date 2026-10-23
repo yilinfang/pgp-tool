@@ -51,6 +51,8 @@ async function readKeyFiles(files) {
 }
 
 export function bindFile(inputId, areaId, statusId, append) {
+  // Clear the input when it opens, so choosing the same file again still loads it.
+  $(inputId).addEventListener("click", (e) => (e.target.value = ""));
   $(inputId).addEventListener("change", async (e) => {
     try {
       const text = await readKeyFiles(e.target.files);
@@ -61,7 +63,6 @@ export function bindFile(inputId, areaId, statusId, append) {
     } catch (err) {
       show(statusId, err.message, true);
     }
-    e.target.value = "";
   });
 }
 

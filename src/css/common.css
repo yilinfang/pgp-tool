@@ -22,6 +22,7 @@ pre.info {
 pre.err {
   color: #b00;
 }
+input[type="file"],
 label {
   display: block;
   margin: 0.25rem 0;
