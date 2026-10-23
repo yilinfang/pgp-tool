@@ -46,7 +46,16 @@ a.home:hover,
   background: #e6e6e6;
 }
 footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
   border-top: 1px solid #ccc;
   padding: 1rem 0;
-  text-align: right;
+}
+footer p {
+  margin: 0;
+}
+footer a.home {
+  flex-shrink: 0;
 }
