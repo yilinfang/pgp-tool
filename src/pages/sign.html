@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Sign · PGP Tool</title>
+    <link rel="stylesheet" href="../css/common.css" />
+  </head>
+  <body>
+    <form id="app" autocomplete="off">
+      <h1>Sign</h1>
+      <p>
+        Nothing is sent or stored. Closing the tab forgets all keys.
+        <button type="button" id="clearAll">Clear all</button>
+      </p>
+
+      <section>
+        <h2>Your private key</h2>
+        <textarea
+          id="myKey"
+          rows="5"
+          spellcheck="false"
+          placeholder="-----BEGIN PGP PRIVATE KEY BLOCK-----"
+        ></textarea>
+        <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+        <label
+          >Passphrase <input type="password" id="myPass" autocomplete="off"
+        /></label>
+        <pre class="info" id="myKeyInfo"></pre>
+      </section>
+
+      <section>
+        <h2>Message</h2>
+        <textarea
+          id="signIn"
+          rows="6"
+          spellcheck="false"
+          placeholder="Message"
+        ></textarea>
+        <button type="button" id="signBtn">Sign</button>
+        <pre class="info" id="signStatus"></pre>
+        <textarea id="signOut" rows="6" spellcheck="false" readonly></textarea>
+        <button type="button" id="signDl">Download</button>
+      </section>
+    </form>
+    <script type="module" src="../js/sign.js"></script>
+  </body>
+</html>

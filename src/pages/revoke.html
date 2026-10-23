@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Revoke · PGP Tool</title>
+    <link rel="stylesheet" href="../css/common.css" />
+  </head>
+  <body>
+    <form id="app" autocomplete="off">
+      <h1>Revoke</h1>
+      <p>
+        Nothing is sent or stored. Closing the tab forgets all keys.
+        <button type="button" id="clearAll">Clear all</button>
+      </p>
+
+      <section>
+        <textarea
+          id="revKey"
+          rows="4"
+          spellcheck="false"
+          placeholder="Your public key"
+        ></textarea>
+        <input type="file" id="revKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+        <textarea
+          id="revCert"
+          rows="4"
+          spellcheck="false"
+          placeholder="Your revocation certificate"
+        ></textarea>
+        <input type="file" id="revCertFile" accept=".asc,.rev,.txt" />
+        <button type="button" id="revBtn">Revoke</button>
+        <pre class="info" id="revStatus"></pre>
+        <textarea id="revOut" rows="4" spellcheck="false" readonly></textarea>
+        <button type="button" id="revDl">Download revoked public key</button>
+      </section>
+    </form>
+    <script type="module" src="../js/revoke.js"></script>
+  </body>
+</html>

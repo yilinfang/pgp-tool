@@ -2,7 +2,8 @@
 
 A static, offline OpenPGP tool for Chrome. No installation, no server, no GnuPG.
 
-Open `index.html` from disk (double-click). Keep `openpgp.min.js` in the same folder.
+Get `pgp-tool.zip` from a release and unzip it. Open `index.html` (double-click), or open the
+page for your task directly in `pages/`. Each page is one standalone file.
 
 ## What it does
 
@@ -18,30 +19,58 @@ Output is compatible with GnuPG and other OpenPGP software (v4 keys).
 ## Privacy
 
 - The page makes no network requests. A Content-Security-Policy blocks them.
+- The Content-Security-Policy allows only the page's own script and style, by their SHA-256 hashes.
+  The browser does not run any other script.
 - The page stores nothing: no cookies, no localStorage, no sessionStorage, no IndexedDB.
 - The page never reads or writes the clipboard.
 - Keys live in page memory only. Close the tab or press **Clear all** to forget them.
+- Each page is separate. When you go to another page, the page forgets all keys.
 
 The page cannot protect you from malware or browser extensions on the same computer.
 
 ## Verify your copy
 
 If you got this tool from a website, a compromised server can serve modified code that steals keys.
-A copy on your own disk is the safest. Check it against these SHA-256 checksums:
+A copy on your own disk is the safest.
 
-```
-e732645b557fcfd04e75bea1b8d23cecd5d7b07de55f8dc161a29b6441d9b9cf  index.html
-e19bf4f04f34f24caded3ff3f3643099538b2674a0a94221e2faca75ac3e4aa1  openpgp.min.js
-```
+The release has a `SHA256SUMS` file. Compare it with the checksums in the release notes, then run:
 
 ```sh
-shasum -a 256 index.html openpgp.min.js
+shasum -a 256 -c SHA256SUMS
 ```
 
-`openpgp.min.js` is the unmodified `dist/openpgp.min.js` from the npm package
-[`openpgp@6.3.2`](https://www.npmjs.com/package/openpgp/v/6.3.2)
-(package integrity `sha512-wcZTzHz41LV8Y48zH/JlD1JT8YdNmpWOuMAjQ/podvvCwsjBEU37K3znJh4UQcj3hksE5z9TzvhbUbwzsGvlLQ==`).
+The build is reproducible. To check a release, build it from source (see below) with the same Bun
+version, and compare `dist/SHA256SUMS` with the `SHA256SUMS` of the release.
+
+## Build from source
+
+You need [Bun](https://bun.sh) (the version in `packageManager` in `package.json`).
+
+```sh
+bun install          # install OpenPGP.js and Prettier
+bun run build        # build the pages into dist/
+bun run release      # build, then make pgp-tool.zip
+bun run format       # format the source with Prettier
+```
+
+```
+src/index.html      start page
+src/pages/          one page for each task
+src/js/             one script for each page, and common.js
+src/css/            common.css
+scripts/build.ts    the build script
+```
+
+The build puts all JavaScript and CSS into each page, and adds the Content-Security-Policy.
+OpenPGP.js comes from the npm package [`openpgp@6.3.2`](https://www.npmjs.com/package/openpgp/v/6.3.2).
+`bun.lock` records its integrity hash, and `bun install` checks it.
 
 ## License
 
-OpenPGP.js is licensed under the LGPL-3.0. See `LICENSE.openpgp`.
+Copyright (C) 2026 Yilin Fang
+
+This project is licensed under the GNU General Public License, version 3 or (at your option)
+any later version (GPL-3.0-or-later).
+See `LICENSE`.
+
+OpenPGP.js is licensed under the LGPL-3.0. A release includes its license as `LICENSE.openpgp`.

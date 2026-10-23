@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>PGP Tool</title>
+    <link rel="stylesheet" href="css/common.css" />
+  </head>
+  <body>
+    <h1>PGP Tool</h1>
+    <p>
+      Everything runs in the page. Nothing is sent or stored. Each page is
+      separate: when you go to another page or close the tab, the page forgets
+      all keys.
+    </p>
+    <ul>
+      <li><a href="pages/generate.html">Generate</a> a new key pair.</li>
+      <li>
+        <a href="pages/encrypt.html">Encrypt</a> a message to public keys, and
+        optionally sign it.
+      </li>
+      <li>
+        <a href="pages/decrypt.html">Decrypt</a> a message with your private
+        key, and verify its signature.
+      </li>
+      <li>
+        <a href="pages/sign.html">Sign</a> a message as a cleartext signature.
+      </li>
+      <li><a href="pages/verify.html">Verify</a> a signed message.</li>
+      <li>
+        <a href="pages/revoke.html">Revoke</a> a public key with its revocation
+        certificate.
+      </li>
+    </ul>
+  </body>
+</html>

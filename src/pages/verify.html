@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Verify · PGP Tool</title>
+    <link rel="stylesheet" href="../css/common.css" />
+  </head>
+  <body>
+    <form id="app" autocomplete="off">
+      <h1>Verify</h1>
+      <p>
+        Nothing is sent or stored. Closing the tab forgets all keys.
+        <button type="button" id="clearAll">Clear all</button>
+      </p>
+
+      <section>
+        <h2>Signer's public key</h2>
+        <textarea
+          id="otherKeys"
+          rows="5"
+          spellcheck="false"
+          placeholder="Paste one or more public keys"
+        ></textarea>
+        <input
+          type="file"
+          id="otherKeysFile"
+          accept=".asc,.gpg,.pgp,.key,.txt"
+          multiple
+        />
+        <pre class="info" id="otherKeysInfo"></pre>
+      </section>
+
+      <section>
+        <h2>Signed message</h2>
+        <textarea
+          id="verIn"
+          rows="6"
+          spellcheck="false"
+          placeholder="-----BEGIN PGP SIGNED MESSAGE-----"
+        ></textarea>
+        <button type="button" id="verBtn">Verify</button>
+        <pre class="info" id="verStatus"></pre>
+        <textarea
+          id="verOut"
+          rows="4"
+          spellcheck="false"
+          readonly
+          placeholder="Signed text"
+        ></textarea>
+      </section>
+    </form>
+    <script type="module" src="../js/verify.js"></script>
+  </body>
+</html>

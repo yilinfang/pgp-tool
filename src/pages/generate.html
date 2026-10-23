@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Generate · PGP Tool</title>
+    <link rel="stylesheet" href="../css/common.css" />
+  </head>
+  <body>
+    <form id="app" autocomplete="off">
+      <h1>Generate</h1>
+      <p>
+        Nothing is sent or stored. Closing the tab forgets the key.
+        <button type="button" id="clearAll">Clear all</button>
+      </p>
+
+      <section>
+        <label
+          >Name
+          <input type="text" id="genName" autocomplete="off" spellcheck="false"
+        /></label>
+        <label
+          >Email (optional)
+          <input
+            type="text"
+            id="genEmail"
+            autocomplete="off"
+            spellcheck="false"
+        /></label>
+        <label
+          >Algorithm
+          <select id="genAlgo">
+            <option value="ecc" selected>ECC Curve25519</option>
+            <option value="rsa">RSA 4096</option>
+          </select></label
+        >
+        <label
+          >Expires
+          <select id="genExpiry">
+            <option value="0">never</option>
+            <option value="1">in 1 year</option>
+            <option value="2" selected>in 2 years</option>
+          </select></label
+        >
+        <label
+          >Passphrase (optional)
+          <input type="password" id="genPass" autocomplete="off"
+        /></label>
+        <label
+          >Passphrase again
+          <input type="password" id="genPass2" autocomplete="off"
+        /></label>
+        <button type="button" id="genBtn">Generate</button>
+        <pre class="info" id="genStatus"></pre>
+        <div id="genDownloads" hidden>
+          <button type="button" id="dlPrivate">Download private key</button>
+          <button type="button" id="dlPublic">Download public key</button>
+          <button type="button" id="dlRevocation">
+            Download revocation certificate
+          </button>
+        </div>
+      </section>
+    </form>
+    <script type="module" src="../js/generate.js"></script>
+  </body>
+</html>
