@@ -1,7 +1,8 @@
 import * as openpgp from "openpgp";
 import { $, show, action, download, describeKey } from "./common.js";
 
-let generated = null;
+// Empty until a key is generated, so the download buttons do nothing before then.
+let generated = {};
 
 action("genBtn", "genStatus", async () => {
   const name = $("genName").value.trim();
@@ -28,11 +29,7 @@ action("genBtn", "genStatus", async () => {
   generated = { privateKey, publicKey, revocationCertificate, prefix };
 
   $("genPass").value = $("genPass2").value = "";
-  $("genDownloads").hidden = false;
-  show(
-    "genStatus",
-    (await describeKey(key)) + "\n\nDone. Download all three files.",
-  );
+  show("genStatus", (await describeKey(key)) + "\n\nDone.");
 });
 $("dlPrivate").addEventListener("click", () =>
   download(generated.prefix + "-private.asc", generated.privateKey),
