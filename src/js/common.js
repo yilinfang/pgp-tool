@@ -176,6 +176,15 @@ async function showKeyInfo(infoId, read) {
 
 // Wire the parts that pages share. Each page has only some of them.
 $("app").addEventListener("submit", (e) => e.preventDefault());
+// A Clear button empties the inputs listed in its data-clear attribute.
+for (const btn of document.querySelectorAll("[data-clear]")) {
+  btn.addEventListener("click", () => {
+    for (const id of btn.dataset.clear.split(" ")) {
+      $(id).value = "";
+      $(id).dispatchEvent(new Event("input"));
+    }
+  });
+}
 if ($("myKey")) {
   $("myKey").addEventListener("input", () =>
     showKeyInfo("myKeyInfo", readMyKey),

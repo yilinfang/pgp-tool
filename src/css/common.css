@@ -27,6 +27,18 @@ label {
   display: block;
   margin: 0.25rem 0;
 }
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+.row input[type="file"] {
+  margin: 0;
+}
+.row [data-clear] {
+  margin-left: auto;
+}
 button,
 a.home,
 ::file-selector-button {

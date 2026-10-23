@@ -23,12 +23,17 @@
           spellcheck="false"
           placeholder="Paste one or more public keys"
         ></textarea>
-        <input
-          type="file"
-          id="otherKeysFile"
-          accept=".asc,.gpg,.pgp,.key,.txt"
-          multiple
-        />
+        <div class="row">
+          <input
+            type="file"
+            id="otherKeysFile"
+            accept=".asc,.gpg,.pgp,.key,.txt"
+            multiple
+          />
+          <button type="button" data-clear="otherKeys otherKeysFile">
+            Clear
+          </button>
+        </div>
         <pre class="info" id="otherKeysInfo"></pre>
       </section>
 
@@ -40,7 +45,10 @@
           spellcheck="false"
           placeholder="-----BEGIN PGP SIGNED MESSAGE-----"
         ></textarea>
-        <button type="button" id="verBtn">Verify</button>
+        <div class="row">
+          <button type="button" id="verBtn">Verify</button>
+          <button type="button" data-clear="verIn">Clear</button>
+        </div>
         <pre class="info" id="verStatus"></pre>
         <textarea
           id="verOut"

@@ -23,7 +23,12 @@
           spellcheck="false"
           placeholder="-----BEGIN PGP PRIVATE KEY BLOCK-----"
         ></textarea>
-        <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+        <div class="row">
+          <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+          <button type="button" data-clear="myKey myKeyFile myPass">
+            Clear
+          </button>
+        </div>
         <label
           >Passphrase <input type="password" id="myPass" autocomplete="off"
         /></label>
@@ -39,12 +44,17 @@
           spellcheck="false"
           placeholder="Paste one or more public keys"
         ></textarea>
-        <input
-          type="file"
-          id="otherKeysFile"
-          accept=".asc,.gpg,.pgp,.key,.txt"
-          multiple
-        />
+        <div class="row">
+          <input
+            type="file"
+            id="otherKeysFile"
+            accept=".asc,.gpg,.pgp,.key,.txt"
+            multiple
+          />
+          <button type="button" data-clear="otherKeys otherKeysFile">
+            Clear
+          </button>
+        </div>
         <pre class="info" id="otherKeysInfo"></pre>
       </section>
 
@@ -56,7 +66,10 @@
           spellcheck="false"
           placeholder="-----BEGIN PGP MESSAGE-----"
         ></textarea>
-        <button type="button" id="decBtn">Decrypt</button>
+        <div class="row">
+          <button type="button" id="decBtn">Decrypt</button>
+          <button type="button" data-clear="decIn">Clear</button>
+        </div>
         <pre class="info" id="decStatus"></pre>
         <textarea id="decOut" rows="6" spellcheck="false" readonly></textarea>
       </section>
