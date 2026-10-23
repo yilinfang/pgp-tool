@@ -4,7 +4,7 @@
   "license": "GPL-3.0-or-later",
   "packageManager": "bun@1.4.3",
   "scripts": {
-    "build": "bun scripts/build.ts",
+    "build": "scripts/build.sh",
     "release": "bun run build && rm -f pgp-tool.zip && cd dist && zip -qrX ../pgp-tool.zip .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

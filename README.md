@@ -58,7 +58,7 @@ src/index.html      start page
 src/pages/          one page for each task
 src/js/             one script for each page, and common.js
 src/css/            common.css
-scripts/build.ts    the build script
+scripts/build.sh    the build script
 ```
 
 The build puts all JavaScript and CSS into each page, and adds the Content-Security-Policy.
