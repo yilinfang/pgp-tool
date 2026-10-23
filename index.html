@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file: 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="no-referrer">
+<title>PGP Tool</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 52rem; margin: 1rem auto; padding: 0 1rem; }
+  section { border-top: 1px solid #ccc; padding: .5rem 0 1rem; }
+  textarea { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 12px; }
+  pre.info { white-space: pre-wrap; font-size: 12px; margin: .25rem 0; }
+  pre.err { color: #b00; }
+  label { display: block; margin: .25rem 0; }
+</style>
+</head>
+<body>
+<form id="app" autocomplete="off" onsubmit="return false">
+
+<h1>PGP Tool</h1>
+<p>Everything runs in this page. Nothing is sent or stored. Closing the tab forgets all keys.
+  <button type="button" id="clearAll">Clear all</button></p>
+
+<section>
+  <h2>Keys</h2>
+  <h3>Your private key</h3>
+  <textarea id="myKey" rows="5" spellcheck="false" placeholder="-----BEGIN PGP PRIVATE KEY BLOCK-----"></textarea>
+  <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt">
+  <label>Passphrase <input type="password" id="myPass" autocomplete="off"></label>
+  <pre class="info" id="myKeyInfo"></pre>
+
+  <h3>Other people's public keys</h3>
+  <textarea id="otherKeys" rows="5" spellcheck="false" placeholder="Paste one or more public keys"></textarea>
+  <input type="file" id="otherKeysFile" accept=".asc,.gpg,.pgp,.key,.txt" multiple>
+  <pre class="info" id="otherKeysInfo"></pre>
+</section>
+
+<section>
+  <h2>Generate</h2>
+  <label>Name <input type="text" id="genName" autocomplete="off" spellcheck="false"></label>
+  <label>Email (optional) <input type="text" id="genEmail" autocomplete="off" spellcheck="false"></label>
+  <label>Algorithm
+    <select id="genAlgo">
+      <option value="ecc" selected>ECC Curve25519</option>
+      <option value="rsa">RSA 4096</option>
+    </select></label>
+  <label>Expires
+    <select id="genExpiry">
+      <option value="0">never</option>
+      <option value="1">in 1 year</option>
+      <option value="2" selected>in 2 years</option>
+    </select></label>
+  <label>Passphrase (optional) <input type="password" id="genPass" autocomplete="off"></label>
+  <label>Passphrase again <input type="password" id="genPass2" autocomplete="off"></label>
+  <button type="button" id="genBtn">Generate</button>
+  <pre class="info" id="genStatus"></pre>
+  <div id="genDownloads" hidden>
+    <button type="button" id="dlPrivate">Download private key</button>
+    <button type="button" id="dlPublic">Download public key</button>
+    <button type="button" id="dlRevocation">Download revocation certificate</button>
+  </div>
+</section>
+
+<section>
+  <h2>Encrypt</h2>
+  <textarea id="encIn" rows="6" spellcheck="false" placeholder="Message"></textarea>
+  <label><input type="checkbox" id="encSelf" checked> Also encrypt to my key</label>
+  <label><input type="checkbox" id="encSign" checked> Sign with my key</label>
+  <button type="button" id="encBtn">Encrypt</button>
+  <pre class="info" id="encStatus"></pre>
+  <textarea id="encOut" rows="6" spellcheck="false" readonly></textarea>
+  <button type="button" id="encDl">Download</button>
+</section>
+
+<section>
+  <h2>Decrypt</h2>
+  <textarea id="decIn" rows="6" spellcheck="false" placeholder="-----BEGIN PGP MESSAGE-----"></textarea>
+  <button type="button" id="decBtn">Decrypt</button>
+  <pre class="info" id="decStatus"></pre>
+  <textarea id="decOut" rows="6" spellcheck="false" readonly></textarea>
+</section>
+
+<section>
+  <h2>Sign</h2>
+  <textarea id="signIn" rows="6" spellcheck="false" placeholder="Message"></textarea>
+  <button type="button" id="signBtn">Sign</button>
+  <pre class="info" id="signStatus"></pre>
+  <textarea id="signOut" rows="6" spellcheck="false" readonly></textarea>
+  <button type="button" id="signDl">Download</button>
+</section>
+
+<section>
+  <h2>Verify</h2>
+  <textarea id="verIn" rows="6" spellcheck="false" placeholder="-----BEGIN PGP SIGNED MESSAGE-----"></textarea>
+  <button type="button" id="verBtn">Verify</button>
+  <pre class="info" id="verStatus"></pre>
+  <textarea id="verOut" rows="4" spellcheck="false" readonly placeholder="Signed text"></textarea>
+</section>
+
+<section>
+  <h2>Revoke</h2>
+  <textarea id="revKey" rows="4" spellcheck="false" placeholder="Your public key"></textarea>
+  <input type="file" id="revKeyFile" accept=".asc,.gpg,.pgp,.key,.txt">
+  <textarea id="revCert" rows="4" spellcheck="false" placeholder="Your revocation certificate"></textarea>
+  <input type="file" id="revCertFile" accept=".asc,.rev,.txt">
+  <button type="button" id="revBtn">Revoke</button>
+  <pre class="info" id="revStatus"></pre>
+  <textarea id="revOut" rows="4" spellcheck="false" readonly></textarea>
+  <button type="button" id="revDl">Download revoked public key</button>
+</section>
+
+</form>
+<script src="openpgp.min.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const KEY_BLOCK = /-----BEGIN PGP (PUBLIC|PRIVATE) KEY BLOCK-----[\s\S]*?-----END PGP \1 KEY BLOCK-----/g;
+let generated = null;
+
+function show(id, text, isError) {
+  $(id).textContent = text;
+  $(id).className = isError ? 'info err' : 'info';
+}
+
+// Run an action and report its errors in the status line of its section.
+function action(buttonId, statusId, fn) {
+  $(buttonId).addEventListener('click', async () => {
+    try { await fn(); } catch (err) { show(statusId, err.message, true); }
+  });
+}
+
+function download(filename, text) {
+  if (!text) return;
+  const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function formatFingerprint(fp) {
+  return fp.toUpperCase().match(/.{4}/g).join(' ');
+}
+
+// Accept armored text, or binary keys as exported by `gpg --export`.
+async function readKeyFiles(files) {
+  const parts = [];
+  for (const file of files) {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const text = new TextDecoder().decode(bytes);
+    if (text.includes('-----BEGIN PGP')) {
+      parts.push(text.trim());
+    } else {
+      for (const key of await openpgp.readKeys({ binaryKeys: bytes })) parts.push(key.armor().trim());
+    }
+  }
+  return parts.join('\n');
+}
+
+function bindFile(inputId, areaId, statusId, append) {
+  $(inputId).addEventListener('change', async e => {
+    try {
+      const text = await readKeyFiles(e.target.files);
+      const area = $(areaId);
+      area.value = append && area.value.trim() ? area.value.trim() + '\n' + text : text;
+      area.dispatchEvent(new Event('input'));
+    } catch (err) {
+      show(statusId, err.message, true);
+    }
+    e.target.value = '';
+  });
+}
+
+async function keyStatus(key) {
+  try {
+    await key.verifyPrimaryKey();
+    return 'valid';
+  } catch (err) {
+    if (await key.isRevoked()) return 'revoked';
+    const exp = await key.getExpirationTime().catch(() => null);
+    if (exp instanceof Date && exp < new Date()) return 'expired';
+    return 'invalid (' + err.message + ')';
+  }
+}
+
+async function describeKey(key) {
+  const algo = key.getAlgorithmInfo();
+  const exp = await key.getExpirationTime().catch(() => null);
+  const type = key.isPrivate() ? (key.isDecrypted() ? 'private (no passphrase)' : 'private (passphrase protected)') : 'public';
+  return [
+    'User ID:     ' + key.getUserIDs().join('\n             '),
+    'Fingerprint: ' + formatFingerprint(key.getFingerprint()),
+    'Algorithm:   ' + algo.algorithm + (algo.curve ? ' ' + algo.curve : '') + (algo.bits ? ' ' + algo.bits : ''),
+    'Created:     ' + key.getCreationTime().toISOString().slice(0, 10),
+    'Expires:     ' + (exp instanceof Date ? exp.toISOString().slice(0, 10) : 'never'),
+    'Status:      ' + await keyStatus(key),
+    'Type:        ' + type,
+  ].join('\n');
+}
+
+async function readMyKey() {
+  const armoredKey = $('myKey').value.trim();
+  return armoredKey ? openpgp.readPrivateKey({ armoredKey }) : null;
+}
+
+async function unlockMyKey() {
+  const key = await readMyKey();
+  if (!key) throw new Error('Load your private key first.');
+  if (key.isDecrypted()) return key;
+  if (!$('myPass').value) throw new Error('Your private key is protected. Type its passphrase.');
+  return openpgp.decryptKey({ privateKey: key, passphrase: $('myPass').value });
+}
+
+async function readOtherKeys() {
+  const blocks = $('otherKeys').value.match(KEY_BLOCK) || [];
+  const keys = [];
+  for (const armoredKeys of blocks) {
+    for (const key of await openpgp.readKeys({ armoredKeys })) keys.push(key.isPrivate() ? key.toPublic() : key);
+  }
+  return keys;
+}
+
+// Keys used to verify signatures: other people's keys and my own public key.
+async function verificationKeys() {
+  const keys = await readOtherKeys();
+  const mine = await readMyKey().catch(() => null);
+  if (mine) keys.push(mine.toPublic());
+  return keys;
+}
+
+async function describeSignatures(signatures, keys) {
+  if (!signatures.length) return 'Not signed.';
+  const lines = [];
+  for (const sig of signatures) {
+    const keyID = sig.keyID.toHex().toUpperCase();
+    const key = keys.find(k => k.getKeys(sig.keyID).length);
+    const who = key ? key.getUserIDs().join(', ') + '\n  ' + formatFingerprint(key.getFingerprint()) : '';
+    try {
+      await sig.verified;
+      lines.push('Good signature from ' + who);
+    } catch (err) {
+      lines.push(key
+        ? 'BAD signature from ' + who + '\n  ' + err.message
+        : 'Cannot verify: no public key for key ID ' + keyID + '. Add the public key of the sender.');
+    }
+  }
+  return lines.join('\n');
+}
+
+async function showKeyInfo(infoId, read) {
+  try {
+    const keys = [].concat(await read() || []);
+    const texts = [];
+    for (const key of keys) texts.push(await describeKey(key));
+    show(infoId, texts.join('\n\n'));
+  } catch (err) {
+    show(infoId, err.message, true);
+  }
+}
+
+$('myKey').addEventListener('input', () => showKeyInfo('myKeyInfo', readMyKey));
+$('otherKeys').addEventListener('input', () => showKeyInfo('otherKeysInfo', readOtherKeys));
+bindFile('myKeyFile', 'myKey', 'myKeyInfo', false);
+bindFile('otherKeysFile', 'otherKeys', 'otherKeysInfo', true);
+bindFile('revKeyFile', 'revKey', 'revStatus', false);
+bindFile('revCertFile', 'revCert', 'revStatus', false);
+
+action('genBtn', 'genStatus', async () => {
+  const name = $('genName').value.trim();
+  const email = $('genEmail').value.trim();
+  const passphrase = $('genPass').value;
+  if (!name) throw new Error('Type a name.');
+  if (passphrase !== $('genPass2').value) throw new Error('The two passphrases are not the same.');
+  const options = {
+    userIDs: [email ? { name, email } : { name }],
+    keyExpirationTime: Number($('genExpiry').value) * 365 * 24 * 60 * 60,
+    format: 'armored',
+  };
+  if ($('genAlgo').value === 'rsa') Object.assign(options, { type: 'rsa', rsaBits: 4096 });
+  else Object.assign(options, { type: 'ecc', curve: 'curve25519Legacy' });
+  if (passphrase) options.passphrase = passphrase;
+
+  show('genStatus', 'Generating...');
+  const { privateKey, publicKey, revocationCertificate } = await openpgp.generateKey(options);
+  const key = await openpgp.readKey({ armoredKey: publicKey });
+  const prefix = key.getFingerprint().toUpperCase().slice(-16);
+  generated = { privateKey, publicKey, revocationCertificate, prefix };
+
+  $('myKey').value = privateKey;
+  $('myPass').value = passphrase;
+  $('myKey').dispatchEvent(new Event('input'));
+  $('genPass').value = $('genPass2').value = '';
+  $('genDownloads').hidden = false;
+  show('genStatus', 'Done. Download all three files. The key is also loaded above.');
+});
+$('dlPrivate').addEventListener('click', () => download(generated.prefix + '-private.asc', generated.privateKey));
+$('dlPublic').addEventListener('click', () => download(generated.prefix + '-public.asc', generated.publicKey));
+$('dlRevocation').addEventListener('click', () => download(generated.prefix + '-revocation.asc', generated.revocationCertificate));
+
+action('encBtn', 'encStatus', async () => {
+  const encryptionKeys = await readOtherKeys();
+  const mine = await readMyKey();
+  const options = { message: await openpgp.createMessage({ text: $('encIn').value }), encryptionKeys };
+  if (mine && $('encSelf').checked) encryptionKeys.push(mine.toPublic());
+  if (mine && $('encSign').checked) options.signingKeys = await unlockMyKey();
+  if (!encryptionKeys.length) throw new Error('Add at least one recipient public key.');
+  $('encOut').value = await openpgp.encrypt(options);
+  show('encStatus', 'Encrypted to ' + encryptionKeys.length + ' key(s)' + (options.signingKeys ? ', signed.' : ', not signed.'));
+});
+$('encDl').addEventListener('click', () => download('message.asc', $('encOut').value));
+
+action('decBtn', 'decStatus', async () => {
+  $('decOut').value = '';
+  const decryptionKeys = await unlockMyKey();
+  const keys = await verificationKeys();
+  const message = await openpgp.readMessage({ armoredMessage: $('decIn').value.trim() });
+  const { data, signatures } = await openpgp.decrypt({ message, decryptionKeys, verificationKeys: keys });
+  $('decOut').value = data;
+  show('decStatus', 'Decrypted. ' + await describeSignatures(signatures, keys));
+});
+
+action('signBtn', 'signStatus', async () => {
+  const signingKeys = await unlockMyKey();
+  const message = await openpgp.createCleartextMessage({ text: $('signIn').value });
+  $('signOut').value = await openpgp.sign({ message, signingKeys });
+  show('signStatus', 'Signed.');
+});
+$('signDl').addEventListener('click', () => download('signed.asc', $('signOut').value));
+
+action('verBtn', 'verStatus', async () => {
+  $('verOut').value = '';
+  const text = $('verIn').value.trim();
+  const keys = await verificationKeys();
+  const message = text.includes('-----BEGIN PGP SIGNED MESSAGE-----')
+    ? await openpgp.readCleartextMessage({ cleartextMessage: text })
+    : await openpgp.readMessage({ armoredMessage: text });
+  const { data, signatures } = await openpgp.verify({ message, verificationKeys: keys });
+  $('verOut').value = data;
+  show('verStatus', await describeSignatures(signatures, keys));
+});
+
+action('revBtn', 'revStatus', async () => {
+  $('revOut').value = '';
+  const key = await openpgp.readKey({ armoredKey: $('revKey').value.trim() });
+  const { publicKey } = await openpgp.revokeKey({
+    key: key.isPrivate() ? key.toPublic() : key,
+    // GnuPG prefixes the certificates in openpgp-revocs.d/ with ':' to prevent accidental import.
+    revocationCertificate: $('revCert').value.trim().replace(/^:-----BEGIN/m, '-----BEGIN'),
+    format: 'armored',
+  });
+  const revoked = await openpgp.readKey({ armoredKey: publicKey });
+  if (!await revoked.isRevoked()) throw new Error('The certificate does not revoke this key.');
+  $('revOut').value = publicKey;
+  show('revStatus', await describeKey(revoked) + '\n\nSend this revoked public key to your contacts.');
+});
+$('revDl').addEventListener('click', async () => {
+  const key = await openpgp.readKey({ armoredKey: $('revOut').value }).catch(() => null);
+  if (key) download(key.getFingerprint().toUpperCase().slice(-16) + '-public-revoked.asc', $('revOut').value);
+});
+
+$('clearAll').addEventListener('click', () => {
+  $('app').reset();
+  for (const el of document.querySelectorAll('pre.info')) show(el.id, '');
+  generated = null;
+  $('genDownloads').hidden = true;
+});
+</script>
+</body>
+</html>
