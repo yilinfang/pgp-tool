@@ -23,14 +23,8 @@
           spellcheck="false"
           placeholder="Your public key"
         ></textarea>
-        <div class="row">
-          <input
-            type="file"
-            id="revKeyFile"
-            accept=".asc,.gpg,.pgp,.key,.txt"
-          />
-          <button type="button" data-clear="revKey revKeyFile">Clear</button>
-        </div>
+        <input type="file" id="revKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+        <button type="button" data-clear="revKey revKeyFile">Clear</button>
       </section>
 
       <section>
@@ -41,14 +35,13 @@
           spellcheck="false"
           placeholder="Your revocation certificate"
         ></textarea>
-        <div class="row">
-          <input type="file" id="revCertFile" accept=".asc,.rev,.txt" />
-          <button type="button" data-clear="revCert revCertFile">Clear</button>
-        </div>
+        <input type="file" id="revCertFile" accept=".asc,.rev,.txt" />
+        <button type="button" data-clear="revCert revCertFile">Clear</button>
       </section>
 
       <section>
-        <h2>Revoked public key</h2>
+        <h2>Revoke</h2>
+        <p>Make a revoked copy of your public key with the certificate.</p>
         <button type="button" id="revBtn">Revoke</button>
         <pre class="info" id="revStatus"></pre>
         <textarea id="revOut" rows="4" spellcheck="false" readonly></textarea>

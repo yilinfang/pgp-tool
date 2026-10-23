@@ -24,12 +24,8 @@
           spellcheck="false"
           placeholder="-----BEGIN PGP PRIVATE KEY BLOCK-----"
         ></textarea>
-        <div class="row">
-          <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
-          <button type="button" data-clear="myKey myKeyFile myPass">
-            Clear
-          </button>
-        </div>
+        <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+        <button type="button" data-clear="myKey myKeyFile myPass">Clear</button>
         <label
           >Passphrase <input type="password" id="myPass" autocomplete="off"
         /></label>
@@ -37,17 +33,16 @@
       </section>
 
       <section>
-        <h2>Message</h2>
+        <h2>Sign</h2>
+        <p>Sign the message with your private key.</p>
         <textarea
           id="signIn"
           rows="6"
           spellcheck="false"
           placeholder="Message"
         ></textarea>
-        <div class="row">
-          <button type="button" id="signBtn">Sign</button>
-          <button type="button" data-clear="signIn">Clear</button>
-        </div>
+        <button type="button" id="signBtn">Sign</button>
+        <button type="button" data-clear="signIn">Clear</button>
         <pre class="info" id="signStatus"></pre>
         <textarea id="signOut" rows="6" spellcheck="false" readonly></textarea>
         <button type="button" id="signDl">Download</button>

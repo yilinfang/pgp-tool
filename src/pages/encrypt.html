@@ -23,17 +23,15 @@
           spellcheck="false"
           placeholder="Paste one or more public keys"
         ></textarea>
-        <div class="row">
-          <input
-            type="file"
-            id="otherKeysFile"
-            accept=".asc,.gpg,.pgp,.key,.txt"
-            multiple
-          />
-          <button type="button" data-clear="otherKeys otherKeysFile">
-            Clear
-          </button>
-        </div>
+        <input
+          type="file"
+          id="otherKeysFile"
+          accept=".asc,.gpg,.pgp,.key,.txt"
+          multiple
+        />
+        <button type="button" data-clear="otherKeys otherKeysFile">
+          Clear
+        </button>
         <pre class="info" id="otherKeysInfo"></pre>
       </section>
 
@@ -46,12 +44,8 @@
           spellcheck="false"
           placeholder="-----BEGIN PGP PRIVATE KEY BLOCK-----"
         ></textarea>
-        <div class="row">
-          <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
-          <button type="button" data-clear="myKey myKeyFile myPass">
-            Clear
-          </button>
-        </div>
+        <input type="file" id="myKeyFile" accept=".asc,.gpg,.pgp,.key,.txt" />
+        <button type="button" data-clear="myKey myKeyFile myPass">Clear</button>
         <label
           >Passphrase <input type="password" id="myPass" autocomplete="off"
         /></label>
@@ -67,17 +61,16 @@
       </section>
 
       <section>
-        <h2>Message</h2>
+        <h2>Encrypt</h2>
+        <p>Encrypt the message to the recipients' public keys.</p>
         <textarea
           id="encIn"
           rows="6"
           spellcheck="false"
           placeholder="Message"
         ></textarea>
-        <div class="row">
-          <button type="button" id="encBtn">Encrypt</button>
-          <button type="button" data-clear="encIn">Clear</button>
-        </div>
+        <button type="button" id="encBtn">Encrypt</button>
+        <button type="button" data-clear="encIn">Clear</button>
         <pre class="info" id="encStatus"></pre>
         <textarea id="encOut" rows="6" spellcheck="false" readonly></textarea>
         <button type="button" id="encDl">Download</button>
